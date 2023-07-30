@@ -1,0 +1,41 @@
+version: '3.1'
+
+services:
+  product_service_db:
+    container_name: product_service_db
+    image: mongo:4.2
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_DATABASE=product-service
+      - MONGO_INITDB_ROOT_PASSWORD=pass
+    networks:
+      - shop_zen_product_service_network
+    ports:
+      - '27017:27017'
+    volumes:
+      - sz_data:/data/db
+
+  product_service_db_client:
+    container_name: product_service_db_client
+    image: mongo-express
+    depends_on:
+      - product_service_db
+    networks:
+      - shop_zen_product_service_network
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=product_service_db
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=pass
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=tribes
+    ports:
+      - '8081:8081'
+    volumes:
+      - sz_data:/data/db
+
+networks:
+  shop_zen_product_service_network:
+    driver: bridge
+
+volumes:
+  sz_data:
